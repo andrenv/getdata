@@ -3,22 +3,24 @@ import pandas as pd
 from datetime import datetime
 
 def get_sector_code(api_key, ticker):
-    url = f"https://api.tradier.com/v1/markets/lookup"
+    url = f"https://api.tradier.com/beta/markets/fundamentals/company"
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Accept': 'application/json'
     }
     params = {
-        'q': ticker
+        'symbols': ticker
     }
     
     response = requests.get(url, headers=headers, params=params)
     data = response.json()
-    
-    # Assuming the API returns a sector code in the response
-    if 'securities' in data and 'security' in data['securities']:
-        return data['securities']['security'][0].get('sector_code', 'Unknown')
-    return 'Unknown'
+
+    try:
+        return data[0]['results'][2]['tables']['asset_classification']['morningstar_sector_code']
+    except:
+        return 0
+
+    return 0
 
 def get_tradier_data(api_key, start_date, end_date, tickers):
     # Define the endpoint and headers
